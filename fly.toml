@@ -1,2 +1,13 @@
+app = "n8n-zenithlabs-ai"
+primary_region = "ord" # Change this to your preferred Fly.io region
+
 [build]
   dockerfile = "Dockerfile"
+
+[env]
+  N8N_BASIC_AUTH_USER="your-username"
+  N8N_BASIC_AUTH_PASSWORD="your-password"
+
+[http_service]
+  internal_port = 5678
+  force_https = true
