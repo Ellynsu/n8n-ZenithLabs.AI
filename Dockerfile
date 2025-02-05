@@ -1,22 +1,28 @@
-# Use official n8n image as the base
+# Use official n8n base image
 FROM n8nio/n8n:latest
 
 # Set working directory
 WORKDIR /app
 
-# Ensure the correct package manager is installed
+# Enable Corepack and install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy package files
+# Check if pnpm is installed correctly (Debugging Step)
+RUN pnpm --version || npm --version
+
+# Copy package.json and lockfile first
 COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies without using frozen lockfile
-RUN pnpm install --no-frozen-lockfile --prod=false
+# Debug: Check if package files exist
+RUN ls -la
 
-# Copy all source files
+# Install dependencies (Retry with npm if pnpm fails)
+RUN if pnpm install --no-frozen-lockfile --prod=false; then echo "pnpm install success"; else npm install --omit=dev; fi
+
+# Copy remaining files
 COPY . .
 
-# Expose the n8n default port
+# Expose n8n port
 EXPOSE 5678
 
 # Start n8n
